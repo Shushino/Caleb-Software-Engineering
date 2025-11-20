@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>To-Do List App</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { color: #333; }
+    li { margin: 8px 0; }
+    .done { text-decoration: line-through; color: gray; }
+    .priority-circle { margin-right: 8px; }
+    button { margin-left: 10px; }
+  </style>
+</head>
+<body>
+  <h1>My To-Do List</h1>
+  <input id="taskInput" type="text" placeholder="Enter task">
+  <select id="priority">
+    <option value="low">🟢 Low</option>
+    <option value="medium">🟡 Medium</option>
+    <option value="high">🔴 High</option>
+  </select>
+  <button onclick="addTask()">Add Task</button>
+
+  <ul id="taskList"></ul>
+
+  <script>
+    let tasks = [];
+    let idCounter = 1;
+
+    function addTask() {
+      let input = document.getElementById("taskInput");
+      let priority = document.getElementById("priority").value;
+      let taskTitle = input.value.trim();
+
+      if(taskTitle) {
+        let task = { 
+          id: idCounter++, 
+          title: taskTitle, 
+          status: "pending", 
+          priority: priority 
+        };
+        tasks.push(task);
+        listTasks();
+        input.value = "";
+      }
+    }
+
+    function listTasks() {
+      let list = document.getElementById("taskList");
+      list.innerHTML = "";
+
+      tasks.forEach(task => {
+        let li = document.createElement("li");
+
+        // Priority circle
+        let circle = document.createElement("span");
+        circle.className = "priority-circle";
+        circle.textContent = task.priority === "low" ? "🟢" : 
+                             task.priority === "medium" ? "🟡" : "🔴";
+        li.appendChild(circle);
+
+        // Checkbox
+        let checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.status === "done";
+        checkbox.onchange = () => toggleTask(task.id);
+        li.appendChild(checkbox);
+
+        // Task text
+        let text = document.createElement("span");
+        text.textContent = " " + task.title;
+        if(task.status === "done") text.className = "done";
+        li.appendChild(text);
+
+        // Delete button
+        let delBtn = document.createElement("button");
+        delBtn.textContent = "Delete";
+        delBtn.onclick = () => deleteTask(task.id);
+        li.appendChild(delBtn);
+
+        list.appendChild(li);
+      });
+    }
+
+    function toggleTask(id) {
+      let task = tasks.find(t => t.id === id);
+      task.status = task.status === "done" ? "pending" : "done";
+      listTasks();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      listTasks();
+    }
+  </script>
+</body>
+</html>
